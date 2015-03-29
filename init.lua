@@ -26,7 +26,7 @@ for n,i in pairs(mbox_coords) do
 	mbox_coords[n][3] = i[1]+2
 	mbox_coords[n][4] = i[2]+3
 	for m,i in pairs(mbox_coords[n]) do
-		mbox_coords[n][m] = (i-8)/16
+		mbox_coords[n][m] = (i-8.5)/16
 	end
 end
 
@@ -49,47 +49,43 @@ local function punch_mbox(pos, node, puncher, pt)
 	plpos.y = plpos.y+1.625
 
 	-- get the coords for param2
-	local a,b,c,mpa,mpb
-	c = "y"
+	local a,mpa,mpb
 	if node.param2 == 0 then
-		a = "z"
-		b = "x"
-		mpa = -1
+		mpb = -1
 	elseif node.param2 == 1 then
-		a = "x"
-		b = "z"
 		mpa = -1
 		mpb = -1
+		a = true
 	elseif node.param2 == 2 then
-		a = "z"
-		b = "x"
-		mpb = -1
+		mpa = -1
 	elseif node.param2 == 3 then
-		a = "x"
-		b = "z"
+		a = true
 	end
 
-	local shpos = {[a]=pos[a], [b]=pos[b], [c]=pos[c]+0.5}
+	local shpos = {x=pos.x, z=pos.z, y=pos.y+0.5}
 
 	-- get the distance from the approximate to the actual punched pos
-	dist[c] = shpos[c]-plpos[c]
-	local m = dist[c]/dir[c]
-	dist[a] = dist[a]*m
-	dist[b] = dist[b]*m
+	dist.y = shpos.y-plpos.y
+	local m = dist.y/dir.y
+	dist.x = dist.x*m
+	dist.z = dist.z*m
 	local tp = vector.subtract(vector.add(plpos, dist), shpos)
 
 	-- multiply to get the coordinates fit to param2
 	mpa = mpa or 1
 	mpb = mpb or 1
-	tp[a] = tp[a]*mpa
-	tp[b] = tp[b]*mpb
-minetest.chat_send_all(dump(tp))
+	tp.x = tp.x*mpa
+	tp.z = tp.z*mpb
+	if a then
+		tp.x, tp.z = tp.z, tp.x
+	end
+
 	-- search for the punched button
 	for n,i in pairs(mbox_coords) do
-		if tp[a] > i[1]
-		and tp[b] > i[2]
-		and tp[a] < i[3]
-		and tp[b] < i[4] then
+		if tp.x > i[1]
+		and tp.z > i[2]
+		and tp.x < i[3]
+		and tp.z < i[4] then
 			return n
 		end
 	end
