@@ -13,6 +13,7 @@ for _,ltier in pairs({"lv", "mv", "hv"}) do
 end
 
 
+-- Music player no formspec control
 -- the position of the buttons in the texture
 local mbox_coords = {
 	{1,3}, {5,3}, {9,3}, stop = {13,3},
@@ -51,21 +52,21 @@ local function punch_mbox(pos, node, puncher, pt)
 	local a,b,c,mpa,mpb
 	c = "y"
 	if node.param2 == 0 then
-		a = "x"
-		b = "z"
+		a = "z"
+		b = "x"
+		mpa = -1
 	elseif node.param2 == 1 then
-		a = "z"
-		b = "x"
-		mpa = -1
-	elseif node.param2 == 2 then
 		a = "x"
 		b = "z"
-		mpb = -1
 		mpa = -1
-	elseif node.param2 == 3 then
+		mpb = -1
+	elseif node.param2 == 2 then
 		a = "z"
 		b = "x"
 		mpb = -1
+	elseif node.param2 == 3 then
+		a = "x"
+		b = "z"
 	end
 
 	local shpos = {[a]=pos[a], [b]=pos[b], [c]=pos[c]+0.5}
@@ -82,7 +83,7 @@ local function punch_mbox(pos, node, puncher, pt)
 	mpb = mpb or 1
 	tp[a] = tp[a]*mpa
 	tp[b] = tp[b]*mpb
-
+minetest.chat_send_all(dump(tp))
 	-- search for the punched button
 	for n,i in pairs(mbox_coords) do
 		if tp[a] > i[1]
@@ -94,6 +95,26 @@ local function punch_mbox(pos, node, puncher, pt)
 	end
 end
 
+-- override the music player
+local change_music = minetest.registered_nodes["technic:music_player"].on_receive_fields
+local old_punch = minetest.registered_nodes["technic:music_player"].on_punch
+minetest.override_item("technic:music_player", {
+	paramtype2 = "facedir",
+	legacy_facedir_simple = true,
+	on_punch = function(pos, node, puncher, pointed_thing)
+		local next_track = punch_mbox(pos, node, puncher, pointed_thing)
+		if next_track then
+			local fields
+			if next_track == "stop" then
+				fields = {stop = true}
+			else
+				fields = {["track"..next_track] = true}
+			end
+			change_music(pos, nil, fields, puncher)
+		end
+		return old_punch(pos, node, puncher, pointed_thing)
+	end
+})
 
 
 local time = math.floor(tonumber(os.clock()-load_time_start)*100+0.5)/100
