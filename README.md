@@ -1,6 +1,7 @@
 [Mod] technic_extras [technic_extras]
 
 * Allows pumping items out of generators
+* Makes the music box not only configurable by using a formspec
 
 **Depends:** see [depends.txt](https://raw.githubusercontent.com/HybridDog/technic_extras/master/depends.txt)  
 **License:** see [LICENSE.txt](https://raw.githubusercontent.com/HybridDog/technic_extras/master/LICENSE.txt)  
