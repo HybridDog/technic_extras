@@ -155,6 +155,7 @@ minetest.register_node(":technic:light_catcher", {
 technic.register_machine("HV", "technic:light_catcher", technic.producer)
 
 if minetest.registered_items["weirdores:antimese"] then
+	-- Crafting
 	minetest.register_craft({
 		output = "technic:light_catcher",
 		recipe = {
@@ -164,6 +165,92 @@ if minetest.registered_items["weirdores:antimese"] then
 		}
 	})
 end
+
+
+-- Automatic mk3 mining drill
+-- 0 or less for default maximum speed
+local speed = 0.1
+
+-- needed to find what the player digs
+local function get_pointed_thing(player, range)
+	local plpos = player:getpos()
+	plpos.y = plpos.y+1.625
+	local dir = player:get_look_dir()
+	local p2 = vector.add(plpos, vector.multiply(dir, range))
+	local _,pos = minetest.line_of_sight(plpos, p2)
+	if not pos then
+		return
+	end
+	return {
+		under = vector.round(pos),
+		above = vector.round(vector.subtract(pos, dir)),
+		type = "node"
+	}
+end
+
+local ranges = {}
+local drills = {}
+local someone_digging
+local timer = 0
+
+-- change the default mk3 drills to get functions, etc.
+for i=1,5,1 do
+	local name = "technic:mining_drill_mk3_"..i
+	local old_item = minetest.registered_items[name]
+
+	ranges[name] = old_item.range or 14
+
+	local old_on_use = old_item.on_use
+	drills[name] = old_on_use
+
+	minetest.override_item(name, {
+		on_use = function(...)
+			someone_digging = true
+			timer = -0.5
+			return old_on_use(...)
+		end
+	})
+end
+
+-- simulate the players digging with it using a globalstep
+minetest.register_globalstep(function(dtime)
+	-- abort if noone uses a drill
+	if not someone_digging then
+		return
+	end
+
+	-- abort that it doesn't dig too fast
+	timer = timer+dtime
+	if timer < speed then
+		return
+	end
+	timer = 0
+
+	local active
+	for _,player in pairs(minetest.get_connected_players()) do
+		if player:get_player_control().LMB then
+			local item = player:get_wielded_item()
+			local itemname = item:get_name()
+			for name,func in pairs(drills) do
+				if name == itemname then
+					-- player has a mk3 drill as wielditem and holds left mouse button
+					local pt = get_pointed_thing(player, ranges[itemname])
+					if pt then
+						-- simulate the function
+						player:set_wielded_item(func(item, player, pt))
+					end
+					active = true
+					break
+				end
+			end
+		end
+	end
+
+	-- disable the function if noone currently uses a mk3 drill to reduce lag
+	if not active then
+		someone_digging = false
+	end
+end)
 
 
 local time = math.floor(tonumber(os.clock()-load_time_start)*100+0.5)/100

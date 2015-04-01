@@ -3,6 +3,7 @@
 * Allows pumping items out of generators
 * Makes the music box not only configurable by using a formspec
 * Adds a black light collecting node
+* Makes the mk3 mining drill to an automatic drill
 
 **Depends:** see [depends.txt](https://raw.githubusercontent.com/HybridDog/technic_extras/master/depends.txt)  
 **License:** see [LICENSE.txt](https://raw.githubusercontent.com/HybridDog/technic_extras/master/LICENSE.txt)  
