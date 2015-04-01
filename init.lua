@@ -131,12 +131,12 @@ minetest.register_node(":technic:light_catcher", {
 	technic_run = function(pos, node)
 		local machine_name = S("Light Catcher")
 
-		local light = node.param1
+		local light = minetest.get_node_light(pos)
 		if light then
-			light = light/256
-		else
-			light = minetest.get_node_light(pos) or 0
 			light = light/15
+		else
+			light = node.param1 or 0
+			light = light/256
 		end
 		local meta = minetest.get_meta(pos)
 
