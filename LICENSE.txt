@@ -1,1 +1,2 @@
-WTFPL
+technic's license for the copied stuff
+rest WTFPL

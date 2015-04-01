@@ -5,7 +5,7 @@ local load_time_start = os.clock()
 for _,ltier in pairs({"lv", "mv", "hv"}) do
 	local name = "technic:"..ltier.."_generator"
 	local tube = minetest.registered_nodes[name].tube
-	-- lv currently doesn't support pipeworks
+	-- lv currently doesnt support pipeworks
 	if tube then
 		tube.input_inventory = "src"
 		minetest.override_item(name, {tube=tube})
@@ -111,6 +111,59 @@ minetest.override_item("technic:music_player", {
 		return old_punch(pos, node, puncher, pointed_thing)
 	end
 })
+
+
+-- add the light catching node
+local max_power = 31274.2
+
+local S = technic.getter
+minetest.register_node(":technic:light_catcher", {
+	description = S("Light Catcher"),
+	tiles = {"technic_extras_light_catcher.png"},
+	groups = {snappy=2, choppy=2, oddly_breakable_by_hand=2, technic_machine=1},
+	sounds = default.node_sound_stone_defaults(),
+	active = false,
+	paramtype = "light",
+	on_construct = function(pos)
+		local meta = minetest.get_meta(pos)
+		meta:set_int("HV_EU_supply", 0)
+	end,
+	technic_run = function(pos, node)
+		local machine_name = S("Light Catcher")
+
+		local light = node.param1
+		if light then
+			light = light/256
+		else
+			light = minetest.get_node_light(pos) or 0
+			light = light/15
+		end
+		local meta = minetest.get_meta(pos)
+
+		if light <= 0 then
+			meta:set_string("infotext", S("%s Idle"):format(machine_name))
+			meta:set_int("HV_EU_supply", 0)
+			return
+		end
+
+		local charge_to_give = math.floor(max_power*light^3+0.5)
+		meta:set_string("infotext", S("@1 Active (@2 EU)", machine_name, technic.prettynum(charge_to_give)))
+		meta:set_int("HV_EU_supply", charge_to_give)
+	end,
+})
+
+technic.register_machine("HV", "technic:light_catcher", technic.producer)
+
+if minetest.registered_items["weirdores:antimese"] then
+	minetest.register_craft({
+		output = "technic:light_catcher",
+		recipe = {
+			{"technic:coal_dust", "technic:coal_dust", "technic:coal_dust"},
+			{"weirdores:antimese", "weirdores:antimese", "weirdores:antimese"},
+			{"weirdores:antimese", "technic:solar_array_hv", "weirdores:antimese"},
+		}
+	})
+end
 
 
 local time = math.floor(tonumber(os.clock()-load_time_start)*100+0.5)/100

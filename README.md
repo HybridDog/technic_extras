@@ -2,6 +2,7 @@
 
 * Allows pumping items out of generators
 * Makes the music box not only configurable by using a formspec
+* Adds a black light collecting node
 
 **Depends:** see [depends.txt](https://raw.githubusercontent.com/HybridDog/technic_extras/master/depends.txt)  
 **License:** see [LICENSE.txt](https://raw.githubusercontent.com/HybridDog/technic_extras/master/LICENSE.txt)  
@@ -12,4 +13,4 @@
 If you got ideas or found bugs, please tell them to me.
 
 TODO:  
-* add black mk4 solar panels
+* add more stuff
