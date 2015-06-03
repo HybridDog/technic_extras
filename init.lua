@@ -231,18 +231,13 @@ minetest.register_globalstep(function(dtime)
 		if player:get_player_control().LMB then
 			local item = player:get_wielded_item()
 			local itemname = item:get_name()
-			for name,func in pairs(drills) do
-				if name == itemname then
-					-- player has a mk3 drill as wielditem and holds left mouse button
-					local pt = get_pointed_thing(player, ranges[itemname])
-					if pt then
-						-- simulate the function
-						player:set_wielded_item(func(item, player, pt))
-					end
-					active = true
-					break
-				end
+			-- player has a mk3 drill as wielditem and holds left mouse button
+			local pt = get_pointed_thing(player, ranges[itemname])
+			if pt then
+				-- simulate the function
+				player:set_wielded_item(drills[itemname](item, player, pt))
 			end
+			active = true
 		end
 	end
 
