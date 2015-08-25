@@ -251,6 +251,71 @@ minetest.register_globalstep(function(dtime)
 end)
 
 
+-- pencil
+local ps = {}
+local function enable_formspec(pname, pos)
+	if minetest.is_protected(pos, pname) then
+		minetest.chat_send_player(pname, "you shouldn't write here, it's protected")
+		return
+	end
+	ps[pname] = pos
+	local meta = minetest.get_meta(pos)
+	local info = minetest.formspec_escape(meta:get_string("infotext"))
+	minetest.show_formspec(pname, "pencil", "size[8,4]"..
+		"textarea[0.3,0;8,4.5;newinfo;;"..info.."]"..
+		"button[3,5;2,-2;;save]"
+	)
+end
+
+minetest.register_tool(":technic:pencil", {
+	description = "Pencil",
+	inventory_image = "technic_pencil.png",
+	on_place = function(_, player, pt)
+		if not player
+		or not pt then
+			return
+		end
+		enable_formspec(player:get_player_name(), pt.under)
+	end
+})
+
+-- the craft recipe is approximated
+minetest.register_craft({
+	output = "technic:pencil",
+	recipe = {
+		{"technic:graphite"},
+		{"group:stick"},
+	}
+})
+
+local change_infotext
+minetest.register_on_player_receive_fields(function(player, formname, fields)
+	if formname ~= "pencil" then
+		return
+	end
+	change_infotext(player, fields)
+end)
+
+function change_infotext(player, fields)
+	local pname = player:get_player_name()
+	if fields.quit
+	or not fields.newinfo then
+		ps[pname] = nil
+		return
+	end
+	local pos = ps[pname]
+	if not pos then
+		return
+	end
+	if minetest.is_protected(pos, pname) then
+		minetest.chat_send_player(pname, "protection seems to be changed")
+		return
+	end
+	minetest.get_meta(pos):set_string("infotext", fields.newinfo)
+	minetest.chat_send_player(pname, "you wrote "..fields.newinfo.." at "..minetest.pos_to_string(pos))
+end
+
+
 local time = math.floor(tonumber(os.clock()-load_time_start)*100+0.5)/100
 local msg = "[technic_extras] loaded after ca. "..time
 if time > 0.05 then
