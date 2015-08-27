@@ -1,6 +1,15 @@
 local load_time_start = os.clock()
 
 
+-- Make wires grindable
+for _,i in pairs({"copper", "silver", "gold"}) do
+	technic.register_grinder_recipe({
+		input = {"technic:fine_"..i.."_wire 2"},
+		output = "technic:"..i.."_dust 3"
+	})
+end
+
+
 -- Allows pumping stuff out of generators
 for _,ltier in pairs({"lv", "mv", "hv"}) do
 	local name = "technic:"..ltier.."_generator"
