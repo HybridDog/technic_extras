@@ -5,6 +5,7 @@
 * Adds a black light collecting node
 * Makes the mk3 mining drill to an automatic drill
 * Adds a pencil to change infotext somewhere
+* Adds a mk2 steam turbine
 
 **Depends:** see [depends.txt](https://raw.githubusercontent.com/HybridDog/technic_extras/master/depends.txt)  
 **License:** see [LICENSE.txt](https://raw.githubusercontent.com/HybridDog/technic_extras/master/LICENSE.txt)  

@@ -316,6 +316,146 @@ function change_infotext(player, fields)
 end
 
 
+-- mk2 steam turbine
+-- tests if it's built right and finds out the heat
+local function construction_invalid(pos)
+	local p = vector.new(pos)
+	p.y = p.y+1
+	if minetest.get_node(p).name ~= "pipeworks:fountainhead" then
+		return  "fountainhead exit missing"
+	end
+	p.y = p.y+1
+	if minetest.get_node(p).name ~= "air" then
+		return  "no air above exit!"
+	end
+	p.y = pos.y-1
+	local name = minetest.get_node(p).name
+	if string.sub(name, 1, 15) ~= "pipeworks:pipe_"
+	or string.sub(name, -7) ~= "_loaded" then
+		return "water filled pipe missing"
+	end
+	p.y = p.y-1
+	local heat = minetest.get_item_group(minetest.get_node(p).name, "hot")
+	if heat == 0 then
+		return "heating node missing"
+	end
+	return heat
+end
+
+-- store known particlespawners in a table
+local spawners = {}
+local function get_spawner(pos)
+	local spawner = spawners[pos.z]
+	if spawner then
+		spawner = spawner[pos.y]
+		if spawner then
+			return spawner[pos.x]
+		end
+	end
+end
+
+local function add_spawner(pos, heat)
+	if get_spawner(pos) then
+		return
+	end
+	local minp = {x=pos.x-0.02, y=pos.y+1.5, z=pos.z-0.02}
+	local maxp = {x=pos.x+0.02, y=pos.y+1.5, z=pos.z+0.02}
+	local spawner = minetest.add_particlespawner({
+		amount = heat*10,
+		time = 0,
+		minpos = minp,
+		maxpos = maxp,
+		minvel = {x=0, y=0.1, z=0},
+		maxvel = {x=0, y=0.3, z=0},
+		minacc = {x=-1, y=1, z=-1},
+		maxacc = {x=1, y=2, z=1},
+		minexptime = 0.1,
+		maxexptime = 4,
+		minsize = 1,
+		maxsize = 2,
+		collisiondetection = true,
+		texture = "technic_steam.png"
+	})
+	if spawners[pos.z] then
+		if spawners[pos.z][pos.y] then
+			spawners[pos.z][pos.y][pos.x] = spawner
+			return
+		end
+		spawners[pos.z][pos.y] = {[pos.x] = spawner}
+		return
+	end
+	spawners[pos.z] = {[pos.y] = {[pos.x] = spawner}}
+end
+
+local function remove_spawner(pos)
+	local spawner = get_spawner(pos)
+	if not spawner then
+		return
+	end
+	spawners[pos.z][pos.y][pos.x] = nil
+	if not next(spawners[pos.z][pos.y]) then
+		spawners[pos.z][pos.y] = nil
+	end
+	if not next(spawners[pos.z]) then
+		spawners[pos.z] = nil
+	end
+	minetest.delete_particlespawner(spawner)
+end
+
+minetest.register_node(":technic:steam_turbine", {
+	description = "MV Steam Turbine",
+	tiles = {"technic_steam_turbine_top.png",  "technic_steam_turbine_bottom.png",
+	        "technic_steam_turbine_side.png", "technic_steam_turbine_side.png",
+	         "technic_steam_turbine_side.png", "technic_steam_turbine_side.png"},
+	groups = {snappy=2, choppy=2, oddly_breakable_by_hand=2, technic_machine=1, pipe=1},
+	sounds = default.node_sound_stone_defaults(),
+	on_construct = function(pos)
+		local meta = minetest.get_meta(pos)
+		meta:set_string("infotext", "MV Steam Turbine")
+		meta:set_int("MV_EU_supply", 0)
+		pipeworks.scan_for_pipe_objects(pos)
+	end,
+	on_destruct = function(pos)
+		remove_spawner(pos)
+		pipeworks.scan_for_pipe_objects(pos)
+	end,
+	-- pipe_connections = {{x=0,y=-1,z=0}}
+	technic_run = function(pos, node)
+		local problem = construction_invalid(pos)
+		local meta = minetest.get_meta(pos)
+		local power = meta:get_int("MV_EU_supply")
+		if type(problem) == "string" then
+			if power ~= 0 then
+				meta:set_int("MV_EU_supply", 0)
+				meta:set_string("infotext", "MV Steam inactive, reason: "..problem)
+				remove_spawner(pos)
+			end
+			return
+		end
+		add_spawner(pos, problem)
+
+		local newpower = problem*670
+		if power == newpower then
+			return
+		end
+
+		meta:set_string("infotext", "MV Steam Turbine active, heat: "..problem)
+		meta:set_int("MV_EU_supply", newpower)
+	end,
+})
+technic.register_machine("MV", "technic:steam_turbine", technic.producer)
+
+-- technic doesn't have a rotor, so…
+minetest.register_craft({
+	output = "technic:steam_turbine",
+	recipe = {
+		{"technic:control_logic_unit", "pipeworks:pipe_1_empty", "technic:motor"},
+		{"technic:diamond_drill_head", "technic:machine_casing", "technic:mv_cable0"},
+		{"technic:stainless_steel_ingot", "pipeworks:pipe_1_empty", "technic:stainless_steel_ingot"},
+	}
+})
+
+
 local time = math.floor(tonumber(os.clock()-load_time_start)*100+0.5)/100
 local msg = "[technic_extras] loaded after ca. "..time
 if time > 0.05 then
