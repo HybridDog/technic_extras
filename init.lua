@@ -358,13 +358,11 @@ local function add_spawner(pos, heat)
 	if get_spawner(pos) then
 		return
 	end
-	local minp = {x=pos.x-0.02, y=pos.y+1.5, z=pos.z-0.02}
-	local maxp = {x=pos.x+0.02, y=pos.y+1.5, z=pos.z+0.02}
 	local spawner = minetest.add_particlespawner({
 		amount = heat*10,
 		time = 0,
-		minpos = minp,
-		maxpos = maxp,
+		minpos = {x=pos.x-0.02, y=pos.y+1.5, z=pos.z-0.02},
+		maxpos = {x=pos.x+0.02, y=pos.y+1.5, z=pos.z+0.02},
 		minvel = {x=0, y=0.1, z=0},
 		maxvel = {x=0, y=0.3, z=0},
 		minacc = {x=-1, y=1, z=-1},
