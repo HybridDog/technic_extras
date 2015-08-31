@@ -1,6 +1,6 @@
 [Mod] technic_extras [technic_extras]
 
-* Makes it possible to grind wires to dust
+* Makes it possible to craft stuff back to their origin
 * Allows pumping items out of generators
 * Makes the music box not only configurable by using a formspec
 * Adds a black light collecting node

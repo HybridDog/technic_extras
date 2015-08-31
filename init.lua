@@ -1,6 +1,7 @@
 local load_time_start = os.clock()
 
 
+-- Crafting stuff back to their origin
 -- Make wires grindable
 for _,i in pairs({"copper", "silver", "gold"}) do
 	technic.register_grinder_recipe({
@@ -8,6 +9,26 @@ for _,i in pairs({"copper", "silver", "gold"}) do
 		output = "technic:"..i.."_dust 3"
 	})
 end
+
+technic.register_grinder_recipe({
+	input = {"technic:copper_plate"},
+	output = "technic:copper_dust 5"
+})
+
+technic.register_grinder_recipe({
+	input = {"technic:graphite"},
+	output = "technic:coal_dust 4"
+})
+
+technic.register_grinder_recipe({
+	input = {"technic:carbon_cloth"},
+	output = "technic:coal_dust 12"
+})
+
+technic.register_grinder_recipe({
+	input = {"technic:carbon_plate"},
+	output = "technic:coal_dust 12"
+})
 
 
 -- Allows pumping stuff out of generators
