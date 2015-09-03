@@ -389,7 +389,7 @@ local function add_spawner(pos, heat)
 		return
 	end
 	local spawner = minetest.add_particlespawner({
-		amount = heat*10,
+		amount = heat*3,
 		time = 0,
 		minpos = {x=pos.x-0.02, y=pos.y+1.5, z=pos.z-0.02},
 		maxpos = {x=pos.x+0.02, y=pos.y+1.5, z=pos.z+0.02},
@@ -399,8 +399,8 @@ local function add_spawner(pos, heat)
 		maxacc = {x=1, y=2, z=1},
 		minexptime = 0.1,
 		maxexptime = 4,
-		minsize = 1,
-		maxsize = 2,
+		minsize = 3,
+		maxsize = 6,
 		collisiondetection = true,
 		texture = "technic_steam.png"
 	})
