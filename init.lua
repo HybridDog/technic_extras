@@ -484,6 +484,28 @@ minetest.register_craft({
 })
 
 
+-- infinite power device
+minetest.register_node(":technic:infinite_power", {
+	description = "fairly infinite power with network! This could be a lie:\r",
+	tiles = {"technic_infinite_power.png"},
+	groups = {snappy=2, choppy=2, oddly_breakable_by_hand=2, technic_machine=1, not_in_creative_inventory=1},
+	sounds = default.node_sound_stone_defaults(),
+	on_construct = function(pos)
+		local meta = minetest.get_meta(pos)
+		meta:set_int("LV_EU_supply", 2^31-1)
+		meta:set_int("MV_EU_supply", 2^31-1)
+		meta:set_int("HV_EU_supply", 2^31-1)
+		--[[
+		meta:set_int("LV_EU_supply", math.abs(meta:get_int("MV_EU_supply")))
+		meta:set_int("MV_EU_supply", math.abs(meta:get_int("HV_EU_supply")))
+		meta:set_int("HV_EU_supply", math.abs(meta:get_int("LV_EU_supply")))--]]
+	end
+})
+technic.register_machine("LV", "technic:infinite_power", technic.producer)
+technic.register_machine("MV", "technic:infinite_power", technic.producer)
+technic.register_machine("HV", "technic:infinite_power", technic.producer)
+
+
 local time = math.floor(tonumber(os.clock()-load_time_start)*100+0.5)/100
 local msg = "[technic_extras] loaded after ca. "..time
 if time > 0.05 then
