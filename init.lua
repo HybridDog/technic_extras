@@ -177,7 +177,7 @@ minetest.register_node(":technic:light_catcher", {
 		end
 
 		local charge_to_give = math.floor(max_power*light^3+0.5)
-		meta:set_string("infotext", S("@1 Active (@2 EU)", machine_name, technic.prettynum(charge_to_give)))
+		meta:set_string("infotext", S("@1 Active (@2 EU)", machine_name, technic.pretty_num(charge_to_give)))
 		meta:set_int("HV_EU_supply", charge_to_give)
 	end,
 })
