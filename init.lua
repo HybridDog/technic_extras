@@ -150,7 +150,7 @@ local S = technic.getter
 minetest.register_node(":technic:light_catcher", {
 	description = S("Light Catcher"),
 	tiles = {"technic_extras_light_catcher.png"},
-	groups = {snappy=2, choppy=2, oddly_breakable_by_hand=2, technic_machine=1},
+	groups = {snappy=2, choppy=2, oddly_breakable_by_hand=2, technic_machine=1, technic_hv=1},
 	sounds = default.node_sound_stone_defaults(),
 	active = false,
 	paramtype = "light",
@@ -435,7 +435,7 @@ minetest.register_node(":technic:steam_turbine", {
 	tiles = {"technic_steam_turbine_top.png",  "technic_steam_turbine_bottom.png",
 	        "technic_steam_turbine_side.png", "technic_steam_turbine_side.png",
 	         "technic_steam_turbine_side.png", "technic_steam_turbine_side.png"},
-	groups = {snappy=2, choppy=2, oddly_breakable_by_hand=2, technic_machine=1, pipe=1},
+	groups = {snappy=2, choppy=2, oddly_breakable_by_hand=2, technic_machine=1, pipe=1, technic_mv=1},
 	sounds = default.node_sound_stone_defaults(),
 	on_construct = function(pos)
 		local meta = minetest.get_meta(pos)
@@ -488,7 +488,7 @@ minetest.register_craft({
 minetest.register_node(":technic:infinite_power", {
 	description = "fairly infinite power with network! This could be a lie:\r",
 	tiles = {"technic_infinite_power.png"},
-	groups = {snappy=2, choppy=2, oddly_breakable_by_hand=2, technic_machine=1, not_in_creative_inventory=1},
+	groups = {snappy=2, choppy=2, oddly_breakable_by_hand=2, technic_machine=1, not_in_creative_inventory=1, technic_lv=1, technic_mv=1, technic_hv=1},
 	sounds = default.node_sound_stone_defaults(),
 	on_construct = function(pos)
 		local meta = minetest.get_meta(pos)
