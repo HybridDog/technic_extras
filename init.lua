@@ -1,4 +1,4 @@
-local load_time_start = os.clock()
+local load_time_start = minetest.get_us_time()
 
 
 -- Crafting stuff back to their origin
@@ -289,10 +289,9 @@ local function enable_formspec(pname, pos)
 		return
 	end
 	ps[pname] = pos
-	local meta = minetest.get_meta(pos)
-	local info = minetest.formspec_escape(meta:get_string("infotext"))
 	minetest.show_formspec(pname, "pencil", "size[8,4]"..
-		"textarea[0.3,0;8,4.5;newinfo;;"..info.."]"..
+		"textarea[0.3,0;8,4.5;newinfo;;"..
+			minetest.formspec_escape(minetest.get_meta(pos):get_string("infotext")).."]"..
 		"button[3,5;2,-2;;save]"
 	)
 end
@@ -320,10 +319,10 @@ minetest.register_craft({
 
 local change_infotext
 minetest.register_on_player_receive_fields(function(player, formname, fields)
-	if formname ~= "pencil" then
-		return
+	if formname == "pencil" then
+		change_infotext(player, fields)
+		return true
 	end
-	change_infotext(player, fields)
 end)
 
 function change_infotext(player, fields)
@@ -335,6 +334,7 @@ function change_infotext(player, fields)
 	end
 	local pos = ps[pname]
 	if not pos then
+		minetest.log("error", "[technic_extras] pencil: position missing for "..pname)
 		return
 	end
 	if minetest.is_protected(pos, pname) then
@@ -352,11 +352,11 @@ local function construction_invalid(pos)
 	local p = vector.new(pos)
 	p.y = p.y+1
 	if minetest.get_node(p).name ~= "pipeworks:fountainhead" then
-		return  "fountainhead exit missing"
+		return "fountainhead exit missing"
 	end
 	p.y = p.y+1
 	if minetest.get_node(p).name ~= "air" then
-		return  "no air above exit!"
+		return "no air above exit!"
 	end
 	p.y = pos.y-1
 	local name = minetest.get_node(p).name
@@ -506,9 +506,9 @@ technic.register_machine("MV", "technic:infinite_power", technic.producer)
 technic.register_machine("HV", "technic:infinite_power", technic.producer)
 
 
-local time = math.floor(tonumber(os.clock()-load_time_start)*100+0.5)/100
-local msg = "[technic_extras] loaded after ca. "..time
-if time > 0.05 then
+local time = (minetest.get_us_time() - load_time_start) / 1000000
+local msg = "[technic_extras] loaded after ca. " .. time .. " seconds."
+if time > 0.01 then
 	print(msg)
 else
 	minetest.log("info", msg)
