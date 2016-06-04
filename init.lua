@@ -402,6 +402,7 @@ local function add_spawner(pos, heat)
 		minsize = 3,
 		maxsize = 6,
 		collisiondetection = true,
+		--collision_removal = true,
 		texture = "technic_steam.png"
 	})
 	if spawners[pos.z] then
