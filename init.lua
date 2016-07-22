@@ -452,7 +452,7 @@ minetest.register_node(":technic:steam_turbine", {
 	technic_run = function(pos, node)
 		local problem = construction_invalid(pos)
 		local meta = minetest.get_meta(pos)
-		local power = meta:get_int("MV_EU_supply")
+		local power = meta:get_int"MV_EU_supply"
 		if type(problem) == "string" then
 			if power ~= 0 then
 				meta:set_int("MV_EU_supply", 0)
@@ -475,14 +475,14 @@ minetest.register_node(":technic:steam_turbine", {
 technic.register_machine("MV", "technic:steam_turbine", technic.producer)
 
 -- technic doesn't have a rotor, so…
-minetest.register_craft({
+minetest.register_craft{
 	output = "technic:steam_turbine",
 	recipe = {
 		{"technic:control_logic_unit", "pipeworks:pipe_1_empty", "technic:motor"},
 		{"technic:diamond_drill_head", "technic:machine_casing", "technic:mv_cable0"},
 		{"technic:stainless_steel_ingot", "pipeworks:pipe_1_empty", "technic:stainless_steel_ingot"},
 	}
-})
+}
 
 
 -- infinite power device
