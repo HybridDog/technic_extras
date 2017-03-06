@@ -20,4 +20,5 @@ If you got ideas or found bugs, please tell them to me.
 [How to install a mod?](http://wiki.minetest.net/Installing_Mods)
 
 TODO:  
-* add more stuff
+* allow swapping batteries of tools for faster reloading
+* more
