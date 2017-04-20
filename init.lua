@@ -484,6 +484,13 @@ minetest.register_craft{
 	}
 }
 
+-- Make lava hot:
+for item, heat in pairs({["default:lava_source"] = 3, ["default:lava_flowing"] = 2}) do
+	local groups = minetest.registered_nodes[item].groups
+	groups.hot = heat
+	minetest.override_item(item, {groups = groups})
+end
+
 
 -- infinite power device
 minetest.register_node(":technic:infinite_power", {
